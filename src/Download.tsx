@@ -1,4 +1,4 @@
-import { Label } from "@radix-ui/react-label";
+import { useState } from "react";
 import { Button } from "./components/ui/button";
 import {
 	Card,
@@ -8,30 +8,60 @@ import {
 	CardHeader,
 	CardTitle,
 } from "./components/ui/card";
+import { Field, FieldGroup, FieldLabel } from "./components/ui/field";
 import { Input } from "./components/ui/input";
 
 export default function Download() {
+	const [pass, setPass] = useState<string | undefined>(undefined);
+	const [hash, setHash] = useState<string | undefined>(undefined);
+
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle>Password</CardTitle>
+				<CardTitle>Download</CardTitle>
 				<CardDescription>
-					Change your password here. After saving, you&apos;ll be logged out.
+					Hier können Sie eine Datei herunterladen. Geben Sie hierfür den Hash
+					der Datei ein und geben Sie das Passwort ein.
 				</CardDescription>
 			</CardHeader>
-			<CardContent className="grid gap-6">
-				<div className="grid gap-3">
-					<Label htmlFor="tabs-demo-current">Current password</Label>
-					<Input id="tabs-demo-current" type="password" />
-				</div>
-				<div className="grid gap-3">
-					<Label htmlFor="tabs-demo-new">New password</Label>
-					<Input id="tabs-demo-new" type="password" />
-				</div>
-			</CardContent>
-			<CardFooter>
-				<Button>Save password</Button>
-			</CardFooter>
+			<form
+				action={"/download.php"}
+				method="post"
+				encType="multipart/form-data"
+				id="downloadForm"
+			>
+				<CardContent className="grid gap-6 space-y-4">
+					<FieldGroup>
+						<Field>
+							<FieldLabel htmlFor="hash">Datei Hash</FieldLabel>
+							<Input
+								name="hash"
+								required
+								id="hash"
+								type="text"
+								value={hash}
+								onChange={(e) => setHash(e.target.value)}
+							/>
+						</Field>
+						<Field>
+							<FieldLabel htmlFor="password">Passwort</FieldLabel>
+							<Input
+								name="password"
+								id="password"
+								required
+								type="password"
+								value={pass}
+								onChange={(e) => setPass(e.target.value)}
+							/>
+						</Field>
+					</FieldGroup>
+				</CardContent>
+				<CardFooter>
+					<Button type="submit" form="downloadForm" className="mt-4">
+						Download
+					</Button>
+				</CardFooter>
+			</form>
 		</Card>
 	);
 }

@@ -112,8 +112,8 @@ export default function Upload() {
 					</FieldGroup>
 					<FieldGroup>
 						<Field>
-							<FieldLabel htmlFor="maxDownload">Downloads</FieldLabel>
-							<Input name="maxDownload" id="maxDownload" type="number" />
+							<FieldLabel htmlFor="max_downloads">Downloads</FieldLabel>
+							<Input name="max_downloads" id="max_downloads" type="number" />
 							<FieldDescription>
 								Hier kann die maximale Download Anzahl eingetragen werden. (0
 								steht für unendlich). <br />
