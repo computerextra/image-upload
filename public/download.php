@@ -1,136 +1,57 @@
 <?php
-
 declare(strict_types=1);
+require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
-require_once __DIR__ . '/config.php';
+ensurePost();
 
-// Nur POST akzeptieren: erwartet werden 'hash' und optional 'password'
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    header('Content-Type: application/json; charset=utf-8');
-    echo json_encode(['error' => 'Method Not Allowed']);
-    exit;
+$hash = (string) ($_POST['hash'] ?? '');
+$password = (string) ($_POST['password'] ?? '');
+
+if ($hash === '' || $password === '') {
+	respondWithError('Etwas ist schiefgelaufen.');
 }
 
-$hash = isset($_POST['hash']) ? trim((string) $_POST['hash']) : '';
-$password = isset($_POST['password']) ? (string) $_POST['password'] : '';
+$pdo = db_connect();
+$stmt = $pdo->prepare('SELECT file_hash, password_hash, original_name, mime_type, size_bytes, stored_path FROM files WHERE file_hash = :file_hash LIMIT 1');
+$stmt->execute([':file_hash' => $hash]);
+$row = $stmt->fetch();
 
-if ($hash === '') {
-    http_response_code(400);
-    header('Content-Type: application/json; charset=utf-8');
-    echo json_encode(['error' => 'Hash fehlt.']);
-    exit;
+// Generic failure to avoid revealing if hash or password was wrong
+if (!$row || !is_array($row)) {
+	respondWithError('Etwas ist schiefgelaufen.', 404);
 }
 
-try {
-    $pdo = get_pdo();
-    $pdo->beginTransaction();
-
-    // Datensatz suchen
-    $stmt = $pdo->prepare('SELECT id, hash, original_name, stored_name, mime_type, size_bytes, password_hash, max_downloads, downloads FROM uploads WHERE hash = :hash');
-    $stmt->execute([':hash' => $hash]);
-    $row = $stmt->fetch();
-
-    if (!$row) {
-        $pdo->rollBack();
-        http_response_code(404);
-        header('Content-Type: application/json; charset=utf-8');
-        echo json_encode(['error' => 'Datei nicht gefunden.']);
-        exit;
-    }
-
-    $uploadsDir = storage_uploads_dir();
-    $filepath = $uploadsDir . DIRECTORY_SEPARATOR . $row['stored_name'];
-    if (!is_file($filepath)) {
-        $pdo->rollBack();
-        http_response_code(410);
-        header('Content-Type: application/json; charset=utf-8');
-        echo json_encode(['error' => 'Datei ist nicht mehr verfügbar.']);
-        exit;
-    }
-
-    // Passwort prüfen (falls gesetzt)
-    if (!empty($row['password_hash'])) {
-        if ($password === '' || !password_verify($password, $row['password_hash'])) {
-            $pdo->rollBack();
-            http_response_code(401);
-            header('Content-Type: application/json; charset=utf-8');
-            echo json_encode(['error' => 'Passwort ist ungültig.']);
-            exit;
-        }
-    }
-
-    $maxDownloads = (int) $row['max_downloads'];
-    $deleteAfterSend = false;
-
-    if ($maxDownloads > 0) {
-        // Limit aktiv
-        if ($maxDownloads === 1) {
-            // Letzter erlaubter Download
-            $upd = $pdo->prepare('UPDATE uploads SET max_downloads = 0, downloads = downloads + 1 WHERE id = :id');
-            $upd->execute([':id' => $row['id']]);
-            $deleteAfterSend = true;
-        } else {
-            $upd = $pdo->prepare('UPDATE uploads SET max_downloads = max_downloads - 1, downloads = downloads + 1 WHERE id = :id');
-            $upd->execute([':id' => $row['id']]);
-        }
-    } else {
-        // Unendlich (0) -> nur Zähler erhöhen
-        $upd = $pdo->prepare('UPDATE uploads SET downloads = downloads + 1 WHERE id = :id');
-        $upd->execute([':id' => $row['id']]);
-    }
-
-    $pdo->commit();
-
-    // Datei ausliefern
-    $mime = $row['mime_type'] ?: 'application/octet-stream';
-    $filesize = filesize($filepath);
-    $downloadName = $row['original_name'] ?: $row['hash'];
-
-    // Schutz vor Ausgabe-Fehlern
-    if (ob_get_level()) {
-        ob_end_clean();
-    }
-    header('Content-Description: File Transfer');
-    header('Content-Type: ' . $mime);
-    header('Content-Length: ' . (string) $filesize);
-    header("Content-Disposition: attachment; filename*=UTF-8''" . rawurlencode($downloadName));
-    header('X-Content-Type-Options: nosniff');
-    header('Cache-Control: no-store');
-
-    $chunkSize = 8192;
-    $fp = fopen($filepath, 'rb');
-    if ($fp === false) {
-        // Falls Öffnen fehlschlägt
-        http_response_code(500);
-        header('Content-Type: application/json; charset=utf-8');
-        echo json_encode(['error' => 'Datei konnte nicht geöffnet werden.']);
-        exit;
-    }
-    while (!feof($fp)) {
-        echo fread($fp, $chunkSize);
-        flush();
-    }
-    fclose($fp);
-
-    // Nach erfolgreichem Versand ggf. löschen
-    if ($deleteAfterSend) {
-        @unlink($filepath);
-        try {
-            $pdo2 = get_pdo();
-            $del = $pdo2->prepare('DELETE FROM uploads WHERE id = :id');
-            $del->execute([':id' => $row['id']]);
-        } catch (Throwable $e) {
-            // Schlucken, um die Auslieferung nicht zu stören
-        }
-    }
-    exit;
-} catch (Throwable $e) {
-    if (isset($pdo) && $pdo->inTransaction()) {
-        $pdo->rollBack();
-    }
-    http_response_code(500);
-    header('Content-Type: application/json; charset=utf-8');
-    echo json_encode(['error' => 'Interner Fehler beim Download.']);
-    exit;
+if (!password_verify($password, (string) $row['password_hash'])) {
+	respondWithError('Etwas ist schiefgelaufen.', 403);
 }
+
+$path = (string) $row['stored_path'];
+if (!is_file($path) || !is_readable($path)) {
+	respondWithError('Etwas ist schiefgelaufen.', 410);
+}
+
+// Send file for download
+$mime = $row['mime_type'] ?: 'application/octet-stream';
+$downloadName = $row['original_name'] ?: ('datei-' . $row['file_hash']);
+
+// Clean output buffers
+while (ob_get_level() > 0) {
+	ob_end_clean();
+}
+
+header('Content-Description: File Transfer');
+header('Content-Type: ' . $mime);
+header('Content-Disposition: attachment; filename="' . rawurlencode($downloadName) . '"');
+header('Content-Transfer-Encoding: binary');
+header('Content-Length: ' . (string) filesize($path));
+header('X-Content-Type-Options: nosniff');
+
+$fp = fopen($path, 'rb');
+if ($fp === false) {
+	respondWithError('Etwas ist schiefgelaufen.', 500);
+}
+fpassthru($fp);
+fclose($fp);
+exit;
+
+

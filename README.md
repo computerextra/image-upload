@@ -1,73 +1,79 @@
-# React + TypeScript + Vite
+# Sicherer Datei-Upload (PHP, MySQL)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Dieses kleine Projekt stellt einen sicheren Datei-Upload und passwortgeschützten Download bereit.
 
-Currently, two official plugins are available:
+## Funktionen
+- Upload bis max. 20 MB
+- Speicherung mit zufälligem Hash als Dateiname (ohne Erweiterung)
+- Passwort wird mit `password_hash()` sicher gehasht
+- Metadaten (Hash, Passwort-Hash, Originalname, MIME, Größe, Pfad, Zeit) in MySQL (Tabelle `files`)
+- Download nur mit korrektem Hash + Passwort, bei Fehlern generische Meldung
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## React Compiler
-
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Projektstruktur
+```
+bootstrap.php        # Bootstrap, DB-Verbindung (PDO SQLite), Schema, Hilfsfunktionen
+public/index.php     # Startseite mit Formularen
+public/upload.php    # Upload-Handler
+public/download.php  # Download-Handler
+storage/             # Gespeicherte Dateien (außerhalb des Webroots verwenden, wenn möglich)
+data/                # SQLite-Datenbank-Datei
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Voraussetzungen
+- PHP ≥ 8.0 mit `pdo_mysql` und `fileinfo`
+- MySQL 5.7+/8.0+
+- Webserver, der `public/` als DocumentRoot nutzt (Empfehlung)
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Konfiguration & Hinweise
+- PHP-`upload_max_filesize` und `post_max_size` sollten ≥ 20M sein. Beispiel (php.ini):
+  ```ini
+  upload_max_filesize = 20M
+  post_max_size = 21M
+  ```
+  Der Code prüft die Größe zusätzlich serverseitig und lehnt größere Uploads ab.
+- Der Ordner `storage/` sollte für den Webserver-Prozess beschreibbar sein. Idealerweise liegt er außerhalb des DocumentRoots.
+- Fehlerausgaben sind absichtlich generisch (keine Unterscheidung, ob Hash oder Passwort falsch ist).
+- MIME-Type wird via `finfo` ermittelt; optional lässt sich eine Allowlist aktivieren (siehe Kommentar in `public/upload.php`).
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Konfiguration (MySQL)
+Variante A – .env (empfohlen):
+
+1) Abhängigkeiten installieren
+```bash
+composer install
 ```
+2) `.env` erstellen
+```bash
+copy env.example .env   # Windows PowerShell/CMD
+# oder: cp env.example .env
+```
+3) Werte in `.env` anpassen (DB-Host, User, Passwort, Name)
+
+Variante B – Umgebungsvariablen:
+Setze folgende Umgebungsvariablen für die DB-Verbindung (Beispiele):
+
+```bash
+set DB_HOST=127.0.0.1
+set DB_PORT=3306
+set DB_NAME=image_upload
+set DB_USER=root
+set DB_PASS=meinPasswort
+set DB_CHARSET=utf8mb4
+```
+
+Die Datenbank (`DB_NAME`) muss existieren; die Tabelle `files` wird automatisch erstellt.
+
+## Starten (lokal, eingebauter PHP-Entwicklungsserver)
+```bash
+php -S 127.0.0.1:8000 -t public
+```
+Dann im Browser: `http://127.0.0.1:8000`
+
+## Sicherheit
+- Passwörter werden gehasht gespeichert (kein Klartext)
+- Datei-Download nur nach erfolgreicher Passwortprüfung
+- Generische Fehlermeldungen vermeiden Informationslecks
+- Zufällige, nicht erratbare Dateinamen (Hash)
+- Keine direkten Zugriffe auf `storage/` per Webserver
+
+
