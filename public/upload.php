@@ -37,11 +37,18 @@ $mime = $finfo->file($tmpPath) ?: null;
 // $allowed = ['image/png','image/jpeg','application/pdf','text/plain'];
 // if ($mime !== null && !in_array($mime, $allowed, true)) { respondWithError('Etwas ist schiefgelaufen.'); }
 
-$originalName = sanitizeFilename((string) ($upload['name'] ?? 'datei'));
+$originalName = $upload['name'];
+$clientName = (string) ($upload['name'] ?? '');
+$clientName = basename(trim($clientName));
+if ($originalName === '') {
+	$originalName = 'unbenannt';
+}
 
-// Generate random hash filename without extension
+// Generate random hash filename and keep original extension (if any)
 $hash = generateRandomHash(16); // 32 hex chars
-$storedPath = STORAGE_PATH . DIRECTORY_SEPARATOR . $hash;
+$ext = pathinfo($originalName, PATHINFO_EXTENSION);
+$storedFilename = $ext !== '' ? ($hash . '.' . $ext) : $hash;
+$storedPath = STORAGE_PATH . DIRECTORY_SEPARATOR . $storedFilename;
 
 // Move uploaded file
 if (!move_uploaded_file($tmpPath, $storedPath)) {

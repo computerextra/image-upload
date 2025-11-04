@@ -96,6 +96,12 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 			<button type="submit">Download starten</button>
 		</form>
 	</section>
+
+	<section>
+		<h2>Gesetzliches</h2>
+		<a href="https://computer-extra.de/Datenschutz" target="_blank" rel="noopener noreferrer">Datenschutz</a>
+		<a href="https://computer-extra.de/Impressum" target="_blank" rel="noopener noreferrer">Impressum</a>
+	</section>
 </body>
 
 </html>

@@ -98,11 +98,6 @@ function ensurePost(): void
     }
 }
 
-function sanitizeFilename(string $name): string
-{
-    // Remove control chars and risky characters
-    $name = preg_replace('/[\x00-\x1F\x7F\\\/:*?"<>|]+/', '_', $name) ?? 'datei';
-    return trim($name) !== '' ? $name : 'datei';
-}
+
 
 
