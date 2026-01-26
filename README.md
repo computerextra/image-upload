@@ -1,3 +1,11 @@
-# React + TypeScript + Vite + shadcn/ui
+# CompEx File Upload
 
-This is a template for a new Vite project with React, TypeScript, and shadcn/ui.
+## TODO
+- [ ] Implement file upload functionality
+- [ ] Implement file download functionality
+- [ ] Implement file deletion functionality
+- [ ] Implement cron job for automatic file deletion
+- [ ] Implement file upload form
+- [ ] Implement file deletion form
+- [ ] Implement file deletion confirmation form
+- [ ] Implement file upload form
