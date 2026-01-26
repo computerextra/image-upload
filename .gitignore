@@ -1,23 +1,24 @@
-# Dependencies and OS
+# Logs
+logs
 *.log
-*.tmp
-*.swp
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
 .DS_Store
-
-# Data and uploaded files
-data/*.sqlite
-storage/*
-!storage/.gitkeep
-
-# PHPStorm / VSCode / Cursor
-.idea/
-.vscode/
-
-# Composer
-vendor/
-composer.lock
-
-# Environment
-.env
-
-
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
