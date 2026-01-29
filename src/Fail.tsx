@@ -9,7 +9,7 @@ import {
 
 export default function Fail() {
   return (
-    <Card className="w-100 mx-auto p-6 bg-emerald-100 border border-emerald-900">
+    <Card className="w-100 mx-auto p-6 bg-red-300 border border-red-900">
       <CardTitle>Fehler</CardTitle>
       <CardDescription>
         <p className="leading-7 not-first:mt-6">
@@ -20,7 +20,7 @@ export default function Fail() {
         Es gab ein Problem beim Herunterladen der Datei. <br />
         Vergewissern Sie sich, dass Sie den richtigen Fingerabdruck und das
         korrekte Passwort eingegeben haben. <br />
-        <Button asChild>
+        <Button asChild className="mt-2">
           <NavLink to="/">Erneut versuchen</NavLink>
         </Button>
       </CardContent>
