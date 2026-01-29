@@ -5,15 +5,16 @@ import {
   NavigationMenuList,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
+import { NavLink } from "react-router";
 
 export default function Header() {
   return (
     <div className="w-full border-b">
       <div className="container mx-auto flex justify-between">
-        <div className="max-w-xs py-3">
+        <NavLink to={"/"} className={"max-w-xs py-3"}>
           <h1 className="text-3xl text-end">Sicherer Datei Upload</h1>
           <h2 className="text-sm text-end">von Computer Extra GmbH</h2>
-        </div>
+        </NavLink>
         <Navigation />
       </div>
     </div>

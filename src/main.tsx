@@ -3,17 +3,19 @@ import { createRoot } from "react-dom/client";
 
 import "@/index.css";
 import App from "@/App.tsx";
-import Header from "@/components/Header.tsx";
-import { Toaster } from "@/components/ui/sonner";
+import { BrowserRouter, Routes, Route } from "react-router";
+import Layout from "./Layout";
+import Success from "./Success";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <div className="min-h-screen">
-      <Header />
-      <div className="container mx-auto my-5">
-        <App />
-      </div>
-      <Toaster />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route index element={<App />} />
+          <Route path=":hash" element={<Success />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   </StrictMode>,
 );
