@@ -166,7 +166,7 @@ function UploadForm() {
 
               return (
                 <Field data-invalid={isInvalid}>
-                  <FieldLabel htmlFor={field.name}>Fingerabdruck</FieldLabel>
+                  <FieldLabel htmlFor={field.name}>Datei</FieldLabel>
                   <Input
                     required
                     type="file"
