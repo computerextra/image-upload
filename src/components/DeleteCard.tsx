@@ -85,8 +85,7 @@ function DeleteForm() {
         toast.success("Erfolg", {
           description: (
             <p className="text-green-400">
-              Der eingegebene Fingerabdruck oder das eingegebene Passwort sind
-              falsch.
+              Die Datei wurde erfolgreich gelöscht.
             </p>
           ),
           classNames: {

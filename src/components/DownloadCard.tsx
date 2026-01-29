@@ -6,13 +6,9 @@ import {
 } from "@/components/ui/card";
 import { z } from "zod";
 import { useForm } from "@tanstack/react-form";
-import axios from "axios";
-import { toast } from "sonner";
 import { Field, FieldError, FieldGroup, FieldLabel } from "./ui/field";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { Spinner } from "./ui/spinner";
-import { useState } from "react";
 
 export default function DownloadCard() {
   return (
@@ -41,8 +37,6 @@ const formSchema = z.object({
 });
 
 function DownloadForm() {
-  const [loading, setLoading] = useState(false);
-
   const form = useForm({
     defaultValues: {
       hash: "",
@@ -51,46 +45,13 @@ function DownloadForm() {
     validators: {
       onSubmit: formSchema,
     },
-    onSubmit: async ({ value }) => {
-      setLoading(true);
-      const formData = new FormData();
-
-      formData.set("hash", value.hash);
-      formData.set("password", value.password);
-
-      const res = await axios.post(
-        "https://api.computer-extra.de/files/download.php",
-        formData,
-      );
-
-      if (res.status != 200) {
-        toast.error("Fehlerhafte Eingabe", {
-          description: (
-            <p className="text-red-400">
-              Der eingegebene Fingerabdruck oder das eingegebene Passwort sind
-              falsch.
-            </p>
-          ),
-          classNames: {
-            content: "text-red-400",
-          },
-          position: "bottom-right",
-          style: {
-            "--border-radius": "calc(var(--radius)  + 4px)",
-          } as React.CSSProperties,
-        });
-      }
-      setLoading(false);
-    },
   });
 
   return (
     <form
       id="download-form"
-      onSubmit={(e) => {
-        e.preventDefault();
-        form.handleSubmit();
-      }}
+      action={"https://api.computer-extra.de/files/download.php"}
+      method="POST"
     >
       <FieldGroup>
         <form.Field
@@ -113,7 +74,6 @@ function DownloadForm() {
                   aria-invalid={isInvalid}
                   placeholder="Dateien Fingerabdruck"
                   autoComplete="off"
-                  disabled={loading}
                 />
                 {isInvalid && <FieldError errors={field.state.meta.errors} />}
               </Field>
@@ -140,21 +100,14 @@ function DownloadForm() {
                   aria-invalid={isInvalid}
                   placeholder="Passwort"
                   autoComplete="off"
-                  disabled={loading}
                 />
                 {isInvalid && <FieldError errors={field.state.meta.errors} />}
               </Field>
             );
           }}
         />
-        <Button type="submit" form="download-form" disabled={loading}>
-          {loading ? (
-            <>
-              <Spinner data-icon="inline-start" /> Bitte warten...
-            </>
-          ) : (
-            "Download"
-          )}
+        <Button type="submit" form="download-form">
+          Download
         </Button>
       </FieldGroup>
     </form>
