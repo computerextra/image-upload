@@ -99,7 +99,6 @@ function UploadForm() {
       formData.set("file", value.file);
       formData.set("password", value.password);
 
-      // TODO: API Endpoint
       const res = await axios.post<{ hash: string }>(
         "https://api.computer-extra.de/files/upload.php",
         formData,

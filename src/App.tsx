@@ -1,8 +1,10 @@
 import { CloudAlert, DownloadCloud, UploadCloud } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import UploadCard from "@/components/UploadCard";
-import DownloadCard from "@/components/DownloadCard";
-import DeleteCard from "@/components/DeleteCard";
+import { lazy } from "react";
+
+const UploadCard = lazy(() => import("@/components/UploadCard"));
+const DownloadCard = lazy(() => import("@/components/DownloadCard"));
+const DeleteCard = lazy(() => import("@/components/DeleteCard"));
 
 export function App() {
   return (

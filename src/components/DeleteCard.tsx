@@ -59,7 +59,7 @@ function DeleteForm() {
 
       formData.set("hash", value.hash);
       formData.set("password", value.password);
-      // TODO: API Endpoint
+
       const res = await axios.post(
         "https://api.computer-extra.de/files/delete.php",
         formData,

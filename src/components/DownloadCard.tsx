@@ -58,12 +58,10 @@ function DownloadForm() {
       formData.set("hash", value.hash);
       formData.set("password", value.password);
 
-      // TODO: API Endpoint
       const res = await axios.post(
         "https://api.computer-extra.de/files/download.php",
         formData,
       );
-      console.log(res);
 
       if (res.status != 200) {
         toast.error("Fehlerhafte Eingabe", {
