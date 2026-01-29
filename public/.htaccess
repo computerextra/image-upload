@@ -1,0 +1,30 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME} !-l
+  RewriteRule . /index.html [L]
+</IfModule>
+
+<IfModule mod_headers.c>
+# Caching
+# 1 Jahr (der maximale unterstützte Wert) für Grafik-/Multimediadateien
+<FilesMatch "\.(ico|jpg|jpeg|gif|png|pdf|mp3|mp4|webp)$">
+Header set Cache-Control "public, max-age=31536000, no-transform"
+</FilesMatch>
+# 2 Stunden für Textdateien
+<FilesMatch "\.(html|htm|xml|txt|xsl)$">
+Header set Cache-Control "public, max-age=7200, must-revalidate"
+</FilesMatch>
+</IfModule>
+ 
+GeoIPEnable On
+SetEnvIf GEOIP_CONTINENT_CODE AF BlockContinent
+SetEnvIf GEOIP_CONTINENT_CODE AN BlockContinent
+SetEnvIf GEOIP_CONTINENT_CODE AS BlockContinent
+SetEnvIf GEOIP_CONTINENT_CODE NA BlockContinent
+SetEnvIf GEOIP_CONTINENT_CODE OC BlockContinent
+SetEnvIf GEOIP_CONTINENT_CODE SA BlockContinent
+Deny from env=BlockContinent
