@@ -20,7 +20,7 @@ export default function Fail() {
         Es gab ein Problem beim Herunterladen der Datei. <br />
         Vergewissern Sie sich, dass Sie den richtigen Fingerabdruck und das
         korrekte Passwort eingegeben haben. <br />
-        <Button asChild className="mt-2">
+        <Button asChild className="mt-2" variant={"outline"}>
           <NavLink to="/">Erneut versuchen</NavLink>
         </Button>
       </CardContent>

@@ -21,6 +21,15 @@ export default function UploadCard() {
         </p>
         <b>Wichtige Hinweise:</b>
         <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
+          <li className="text-black font-semibold">
+            Wir erhalten keine Information über Dateien, die Sie über diese
+            Platform hochladen. Falls Sie die Datei für einen Mitarbeiter von
+            uns Hochladen sollten, wenden Sie sich nach dem erfolgreichen
+            Hochladen bitte an Ihren Ansprechpartner bei uns im Haus. Teilen Sie
+            ihm den Fingerabdruck mit beziehungsweise schicken Sie diesen per
+            E-Mail. Teilen Sie Ihrem Ansprechpartner im Anschluss das Passwort
+            für den Download der Datei mit.
+          </li>
           <li>
             Sie erhalten nach dem erfolgreichen Hochladen den Fingerabdruck der
             Datei, ohne diesen Wert kann die Datei nicht heruntergeladen werden.
