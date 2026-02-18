@@ -53,7 +53,7 @@ export default function UploadCard() {
   );
 }
 
-const fileSizeLimit = 20 * 1024 * 1024; // 20 MB
+const fileSizeLimit = 50 * 1024 * 1024; // 50 MB
 
 const formSchema = z.object({
   password: z
