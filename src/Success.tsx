@@ -32,7 +32,7 @@ export default function Success() {
         <Separator className="my-2 bg-emerald-900" />
         <br />
         Link zum teilen: <br />
-        <span className="my-1 font-semibold">
+        <span className="my-1 font-semibold break-all">
           https://upload.computer-extra.de/{hash}/download
         </span>
         <CopyButton
