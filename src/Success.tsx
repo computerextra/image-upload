@@ -29,8 +29,15 @@ export default function Success() {
         <code className="relative font-mono text-sm font-semibold bg-muted rouded px-[0.3rem] py-[0.2rem]">
           {hash}
         </code>
+        <Separator className="my-2 bg-emerald-900" />
         <br />
-        <CopyButton text={hash} />
+        Link zum teilen: <br />
+        <span className="my-1 font-semibold">
+          https://upload.computer-extra.de/{hash}/download
+        </span>
+        <CopyButton
+          text={`https://upload.computer-extra.de/${hash}/download`}
+        />
         <br />
         <br />
         <span className="font-bold">Bitte beachten Sie:</span> Wir erhalten

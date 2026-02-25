@@ -80,7 +80,7 @@ export function CopyButton({
       {...props}
     >
       <Copy className="mr-2 h-4 w-4" />
-      {copied ? "Kopiert!" : "In Zwischenablage kopieren"}
+      {copied ? "Kopiert!" : "Link kopieren"}
     </Button>
   );
 }

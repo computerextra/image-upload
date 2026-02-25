@@ -1,12 +1,14 @@
-import { StrictMode } from "react";
+import { lazy, StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
 import "@/index.css";
-import App from "@/App.tsx";
 import { BrowserRouter, Routes, Route } from "react-router";
 import Layout from "./Layout";
-import Success from "./Success";
-import Fail from "./Fail";
+
+const App = lazy(() => import("@/App.tsx"));
+const Success = lazy(() => import("@/Success.tsx"));
+const Fail = lazy(() => import("@/Fail.tsx"));
+const Download = lazy(() => import("@/Download.tsx"));
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -16,6 +18,7 @@ createRoot(document.getElementById("root")!).render(
           <Route index element={<App />} />
           <Route path="Fehler" element={<Fail />} />
           <Route path=":hash" element={<Success />} />
+          <Route path=":hash/download" element={<Download />} />
         </Route>
       </Routes>
     </BrowserRouter>

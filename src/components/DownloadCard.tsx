@@ -10,7 +10,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "./ui/field";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 
-export default function DownloadCard() {
+export default function DownloadCard({ hash }: { hash?: string }) {
   return (
     <Card>
       <CardTitle>Datei Herunterladen</CardTitle>
@@ -22,7 +22,7 @@ export default function DownloadCard() {
         </p>
       </CardDescription>
       <CardContent>
-        <DownloadForm />
+        <DownloadForm hash={hash} />
       </CardContent>
     </Card>
   );
@@ -36,10 +36,10 @@ const formSchema = z.object({
   password: z.string("Das Passwort ist ein Pflichtfeld"),
 });
 
-function DownloadForm() {
+function DownloadForm({ hash }: { hash?: string }) {
   const form = useForm({
     defaultValues: {
-      hash: "",
+      hash: hash ?? "",
       password: "",
     },
     validators: {
